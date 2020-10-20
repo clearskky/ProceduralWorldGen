@@ -4,8 +4,9 @@ using System;
 
 public class CellularAutomataWorldgen : MonoBehaviour
 {
+	public Transform tileContainer;
 	public GameObject dirtTile, mineralTile;
-	private int tileLength = 75;
+	public int tileLength;
 	public int width;
 	public int height;
 	public string seed;
@@ -23,6 +24,7 @@ public class CellularAutomataWorldgen : MonoBehaviour
 
 	int[,] mineralMap;
 	int[,] smoothedMineralMap;
+
 
 	Renderer renderer;
 
@@ -158,6 +160,7 @@ public class CellularAutomataWorldgen : MonoBehaviour
 
 	public void InstantiateMap()
 	{
+		GameObject currentTile;
 		for (int currentPosX = 0; currentPosX < fillMap.GetUpperBound(0); currentPosX++)
 		{
 			for (int currentPosY = 0; currentPosY < fillMap.GetUpperBound(1); currentPosY++)
@@ -166,11 +169,13 @@ public class CellularAutomataWorldgen : MonoBehaviour
 				{
 					if (mineralMap[currentPosX, currentPosY] == 1)
 					{
-						GameObject.Instantiate(mineralTile, new Vector3(currentPosX * tileLength, currentPosY * tileLength, 10), Quaternion.identity);
+						currentTile = GameObject.Instantiate(mineralTile, new Vector3(currentPosX * tileLength, currentPosY * tileLength * (-1), 10), Quaternion.identity, transform);
+						currentTile.name = "mineralTile_" + currentPosX.ToString() + "_" + currentPosY.ToString();
 					}
 					else
 					{
-						GameObject.Instantiate(dirtTile, new Vector3(currentPosX * tileLength, currentPosY * tileLength, 10), Quaternion.identity);
+						currentTile = GameObject.Instantiate(dirtTile, new Vector3(currentPosX * tileLength, currentPosY * tileLength * (-1), 10), Quaternion.identity, transform);
+						currentTile.name = "dirtTile_" + currentPosX.ToString() + "_" + currentPosY.ToString();
 					}
 				}
 			}
