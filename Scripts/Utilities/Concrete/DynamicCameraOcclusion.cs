@@ -4,14 +4,15 @@ using UnityEngine;
 
 public class DynamicCameraOcclusion : MonoBehaviour
 {
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerLeave2D(Collider2D collision)
     {
-        Destroy(collision.gameObject.GetComponent<Rigidbody2D>());
+        Destroy(collision.gameObject.GetComponent<BoxCollider2D>());
     }
 
-    private void OnTriggerLeave2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        Rigidbody2D rb = other.gameObject.AddComponent<Rigidbody2D>();
-        rb.bodyType = RigidbodyType2D.Static;
+        BoxCollider2D rb = other.gameObject.AddComponent<BoxCollider2D>();
+        rb.size = new Vector2(10, 10);
+        //rb.bodyType = RigidbodyType2D.Static;
     }
 }

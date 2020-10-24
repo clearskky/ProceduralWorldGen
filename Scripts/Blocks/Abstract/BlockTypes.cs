@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IBlock
+public enum BlockTypes 
 {
-    void GetMined();
+    Dirt,
+    Jade
 }

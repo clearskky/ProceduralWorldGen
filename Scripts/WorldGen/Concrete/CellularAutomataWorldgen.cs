@@ -6,7 +6,7 @@ public class CellularAutomataWorldgen : MonoBehaviour
 {
 	public Transform tileContainer;
 	public GameObject dirtTile, mineralTile;
-	public int tileLength;
+	private float tileLength;
 	public int width;
 	public int height;
 	public string seed;
@@ -30,13 +30,10 @@ public class CellularAutomataWorldgen : MonoBehaviour
 
 	void Start()
 	{
-		//if (Input.GetKeyDown(KeyCode.Space))
-		//{
-			GenerateFillMap();
-			GenerateMineralMap();
-			//GenerateTexture();
-			InstantiateMap();
-		//}
+		tileLength = dirtTile.GetComponent<BoxCollider2D>().size.x;
+		GenerateFillMap();
+		GenerateMineralMap();
+		InstantiateMap();
 	}
 
 	void GenerateFillMap()
@@ -160,7 +157,7 @@ public class CellularAutomataWorldgen : MonoBehaviour
 
 	public void InstantiateMap()
 	{
-		GameObject currentTile;
+		Block lastCreatedTile;
 		for (int currentPosX = 0; currentPosX < fillMap.GetUpperBound(0); currentPosX++)
 		{
 			for (int currentPosY = 0; currentPosY < fillMap.GetUpperBound(1); currentPosY++)
@@ -169,16 +166,25 @@ public class CellularAutomataWorldgen : MonoBehaviour
 				{
 					if (mineralMap[currentPosX, currentPosY] == 1)
 					{
-						currentTile = GameObject.Instantiate(mineralTile, new Vector3(currentPosX * tileLength, currentPosY * tileLength * (-1), 10), Quaternion.identity, transform);
-						currentTile.name = "mineralTile_" + currentPosX.ToString() + "_" + currentPosY.ToString();
+						CreateTile(mineralTile, currentPosX, currentPosY);
 					}
 					else
 					{
-						currentTile = GameObject.Instantiate(dirtTile, new Vector3(currentPosX * tileLength, currentPosY * tileLength * (-1), 10), Quaternion.identity, transform);
-						currentTile.name = "dirtTile_" + currentPosX.ToString() + "_" + currentPosY.ToString();
+						CreateTile(dirtTile, currentPosX, currentPosY);
 					}
 				}
 			}
 		}
+	}
+
+	private GameObject CreateTile(GameObject prefabToInstantiate, int currentPosX, int currentPosY)
+	{
+		GameObject currentTile;
+		currentTile = GameObject.Instantiate(prefabToInstantiate, new Vector3(currentPosX * tileLength, currentPosY * tileLength * (-1), 10), Quaternion.identity, transform);
+		currentTile.name = "dirtTile_" + currentPosX.ToString() + "_" + currentPosY.ToString();
+		Block currentBlock = (Block)currentTile.GetComponent<IBlock>();
+		currentBlock.posX = currentPosX;
+		currentBlock.posY = currentPosY;
+		return currentTile;
 	}
 }

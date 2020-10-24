@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IBlock
+public interface ICanvasManager
 {
-    void GetMined();
+
 }
