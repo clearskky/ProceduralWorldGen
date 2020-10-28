@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class DynamicCameraOcclusion : MonoBehaviour
 {
-    private void OnTriggerLeave2D(Collider2D collision)
+    private void OnTriggerExit2D(Collider2D chunk) // Calling it chunk because Camera can only collide with chunk controllers
     {
-        Destroy(collision.gameObject.GetComponent<BoxCollider2D>());
+        Debug.Log("Goodnight");
+        chunk.gameObject.GetComponent<ChunkController>().DisableAllTiles();
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D chunk)
     {
-        BoxCollider2D rb = other.gameObject.AddComponent<BoxCollider2D>();
-        rb.size = new Vector2(10, 10);
-        //rb.bodyType = RigidbodyType2D.Static;
+        Debug.Log("Hello ");
+        chunk.GetComponent<ChunkController>().EnableAllTiles();
     }
 }

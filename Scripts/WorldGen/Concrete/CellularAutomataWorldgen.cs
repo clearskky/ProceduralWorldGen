@@ -4,13 +4,10 @@ using System;
 
 public class CellularAutomataWorldgen : MonoBehaviour
 {
-	public Transform tileContainer;
-	public GameObject dirtTile, mineralTile;
-	private float tileLength;
-	public int width;
-	public int height;
-	public string seed;
+	public GameObject pfab_chunkManager;
+	public int chunkManagerWidth, chunkManagerHeight;
 
+	public string seed;
 	public int smoothnessIterationCount;
 
 	[Range(0, 100)]
@@ -19,10 +16,7 @@ public class CellularAutomataWorldgen : MonoBehaviour
 	[Range(0, 100)]
 	public int mineralPercentage;
 
-	int[,] fillMap;
 	int[,] smoothedFillMap;
-
-	int[,] mineralMap;
 	int[,] smoothedMineralMap;
 
 
@@ -30,29 +24,29 @@ public class CellularAutomataWorldgen : MonoBehaviour
 
 	void Start()
 	{
-		tileLength = dirtTile.GetComponent<BoxCollider2D>().size.x;
 		GenerateFillMap();
 		GenerateMineralMap();
-		InstantiateMap();
+		InstantiateChunkControllers();
+		//InstantiateMap();
 	}
 
 	void GenerateFillMap()
 	{
-		fillMap = new int[width, height];
+		WorldManager.fillMap = new int[WorldManager.width, WorldManager.height];
 
 		System.Random pseudoRandomGenerator = new System.Random(seed.GetHashCode());
 
-		for (int x = 0; x < width; x++)
+		for (int x = 0; x < WorldManager.width; x++)
 		{
-			for (int y = 0; y < height; y++)
+			for (int y = 0; y < WorldManager.height; y++)
 			{
-				if (x == 0 || x == width - 1 || y == 0 || y == height - 1)
+				if (x == 0 || x == WorldManager.width - 1 || y == 0 || y == WorldManager.height - 1)
 				{
-					fillMap[x, y] = 1; // 1 means the block is filled, 0 means its not.
+					WorldManager.fillMap[x, y] = 1; // 1 means the block is filled, 0 means its not.
 				}
 				else
 				{
-					fillMap[x, y] = (pseudoRandomGenerator.Next(0, 100) < fillPercentage) ? 1 : 0;
+					WorldManager.fillMap[x, y] = (pseudoRandomGenerator.Next(0, 100) < fillPercentage) ? 1 : 0;
 				}
 			}
 		}
@@ -62,12 +56,12 @@ public class CellularAutomataWorldgen : MonoBehaviour
 
 	void SmoothFillMap(int iterationCount)
 	{
-		smoothedFillMap = new int[width, height];
+		smoothedFillMap = new int[WorldManager.width, WorldManager.height];
 		for (int currentIteration = 0; currentIteration < iterationCount; currentIteration++)
 		{
-			for (int x = 0; x < width; x++)
+			for (int x = 0; x < WorldManager.width; x++)
 			{
-				for (int y = 0; y < height; y++)
+				for (int y = 0; y < WorldManager.height; y++)
 				{
 					int neighbourWallTiles = GetSurroundingWallCount(x, y);
 
@@ -78,7 +72,7 @@ public class CellularAutomataWorldgen : MonoBehaviour
 
 				}
 			}
-			fillMap = smoothedFillMap;
+			WorldManager.fillMap = smoothedFillMap;
 		}
 		
 	}
@@ -90,11 +84,11 @@ public class CellularAutomataWorldgen : MonoBehaviour
 		{
 			for (int neighbourY = gridY - 1; neighbourY <= gridY + 1; neighbourY++)
 			{
-				if (neighbourX >= 0 && neighbourX < width && neighbourY >= 0 && neighbourY < height)
+				if (neighbourX >= 0 && neighbourX < WorldManager.width && neighbourY >= 0 && neighbourY < WorldManager.height)
 				{
 					if (neighbourX != gridX || neighbourY != gridY)
 					{
-						wallCount += fillMap[neighbourX, neighbourY];
+						wallCount += WorldManager.fillMap[neighbourX, neighbourY];
 					}
 				}
 				else
@@ -109,68 +103,60 @@ public class CellularAutomataWorldgen : MonoBehaviour
 
 	public void GenerateMineralMap()
 	{
-		mineralMap = new int[width, height];
+		WorldManager.mineralMap = new int[WorldManager.width, WorldManager.height];
 
 		System.Random pseudoRandomGenerator = new System.Random(seed.GetHashCode());
 
-		for (int x = 0; x < width; x++)
+		for (int x = 0; x < WorldManager.width; x++)
 		{
-			for (int y = 0; y < height; y++)
+			for (int y = 0; y < WorldManager.height; y++)
 			{
-				if (x == 0 || x == width - 1 || y == 0 || y == height - 1)
+				if (x == 0 || x == WorldManager.width - 1 || y == 0 || y == WorldManager.height - 1)
 				{
-					mineralMap[x, y] = 0; // 1 means the block is a mineral block, 0 means its not.
+					WorldManager.mineralMap[x, y] = 0; // 1 means the block is a mineral block, 0 means its not.
 				}
-				else if (fillMap[x,y] == 1)
+				else if (WorldManager.fillMap[x,y] == 1)
 				{
-					mineralMap[x, y] = (pseudoRandomGenerator.Next(0, 100) < mineralPercentage) ? 1 : 0;
+					WorldManager.mineralMap[x, y] = (pseudoRandomGenerator.Next(0, 100) < mineralPercentage) ? 1 : 0;
 				}
 				else
 				{
-					mineralMap[x, y] = 0;
+					WorldManager.mineralMap[x, y] = 0;
 				}
 			}
 		}
 	}
 
-	public void GenerateTexture()
+	public void InstantiateChunkControllers()
 	{
-		renderer = GetComponent<Renderer>();
-		Texture2D texture = new Texture2D(width, height);
-
-		for (int currentPosX = 0; currentPosX < width; currentPosX++)
+		GameObject lastCreatedObject;
+		for (int currentPosX = 0; currentPosX < WorldManager.fillMap.GetUpperBound(0); currentPosX += chunkManagerWidth)
 		{
-			for (int currentPosY = 0; currentPosY < height; currentPosY++)
+			for (int currentPosY = 0; currentPosY < WorldManager.fillMap.GetUpperBound(1); currentPosY += chunkManagerHeight)
 			{
-				Color color = (fillMap[currentPosX, currentPosY] == 1) ? new Color(0,0,0) : new Color(255,255,255);
-				if (color.r <= 0.0f) // Only way the red channel can be zero is if its a filled square.
-				{
-					color = (mineralMap[currentPosX, currentPosY] == 1) ? new Color(0, 255, 0) : new Color(0, 0, 0);
-				}
-				texture.SetPixel(currentPosX, currentPosY, color);
+				lastCreatedObject = GameObject.Instantiate(pfab_chunkManager, new Vector3(currentPosX * WorldManager.tileLength, currentPosY * WorldManager.tileLength * (-1), 0), Quaternion.identity, transform);
+				ChunkController lastCreatedController = lastCreatedObject.GetComponent<ChunkController>();
+				lastCreatedController.InitializeVariables(currentPosX, currentPosX + chunkManagerWidth, currentPosY, currentPosY + chunkManagerHeight);
 			}
 		}
-		texture.filterMode = FilterMode.Point;
-		texture.Apply();
-		renderer.material.mainTexture = texture;
 	}
 
 	public void InstantiateMap()
 	{
 		Block lastCreatedTile;
-		for (int currentPosX = 0; currentPosX < fillMap.GetUpperBound(0); currentPosX++)
+		for (int currentPosX = 0; currentPosX < WorldManager.fillMap.GetUpperBound(0); currentPosX++)
 		{
-			for (int currentPosY = 0; currentPosY < fillMap.GetUpperBound(1); currentPosY++)
+			for (int currentPosY = 0; currentPosY < WorldManager.fillMap.GetUpperBound(1); currentPosY++)
 			{
-				if (fillMap[currentPosX, currentPosY] == 1)
+				if (WorldManager.fillMap[currentPosX, currentPosY] == 1)
 				{
-					if (mineralMap[currentPosX, currentPosY] == 1)
+					if (WorldManager.mineralMap[currentPosX, currentPosY] == 1)
 					{
-						CreateTile(mineralTile, currentPosX, currentPosY);
+						CreateTile(WorldManager.mineralTile, currentPosX, currentPosY);
 					}
 					else
 					{
-						CreateTile(dirtTile, currentPosX, currentPosY);
+						CreateTile(WorldManager.dirtTile, currentPosX, currentPosY);
 					}
 				}
 			}
@@ -180,11 +166,32 @@ public class CellularAutomataWorldgen : MonoBehaviour
 	private GameObject CreateTile(GameObject prefabToInstantiate, int currentPosX, int currentPosY)
 	{
 		GameObject currentTile;
-		currentTile = GameObject.Instantiate(prefabToInstantiate, new Vector3(currentPosX * tileLength, currentPosY * tileLength * (-1), 10), Quaternion.identity, transform);
+		currentTile = GameObject.Instantiate(prefabToInstantiate, new Vector3(currentPosX * WorldManager.tileLength, currentPosY * WorldManager.tileLength * (-1), 0), Quaternion.identity, transform);
 		currentTile.name = "dirtTile_" + currentPosX.ToString() + "_" + currentPosY.ToString();
 		Block currentBlock = (Block)currentTile.GetComponent<IBlock>();
 		currentBlock.posX = currentPosX;
 		currentBlock.posY = currentPosY;
 		return currentTile;
+	}
+	public void GenerateTexture()
+	{
+		renderer = GetComponent<Renderer>();
+		Texture2D texture = new Texture2D(WorldManager.width, WorldManager.height);
+
+		for (int currentPosX = 0; currentPosX < WorldManager.width; currentPosX++)
+		{
+			for (int currentPosY = 0; currentPosY < WorldManager.height; currentPosY++)
+			{
+				Color color = (WorldManager.fillMap[currentPosX, currentPosY] == 1) ? new Color(0, 0, 0) : new Color(255, 255, 255);
+				if (color.r <= 0.0f) // Only way the red channel can be zero is if its a filled square.
+				{
+					color = (WorldManager.mineralMap[currentPosX, currentPosY] == 1) ? new Color(0, 255, 0) : new Color(0, 0, 0);
+				}
+				texture.SetPixel(currentPosX, currentPosY, color);
+			}
+		}
+		texture.filterMode = FilterMode.Point;
+		texture.Apply();
+		renderer.material.mainTexture = texture;
 	}
 }
