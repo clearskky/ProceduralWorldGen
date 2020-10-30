@@ -1,6 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Mathematics;
+using Unity.Jobs;
+using Unity.Collections;
+using Unity.Entities;
 
 public class ChunkController : MonoBehaviour, IChunkManager
 {
@@ -18,13 +22,6 @@ public class ChunkController : MonoBehaviour, IChunkManager
 		this.chunkRangeYEnd = chunkRangeYEnd;
 	}
 
-	//void Start()
-	//{
-	//	if (chunkRangeXStart == 0 && chunkRangeYStart == 56)
-	//	{
-	//		CreateChunk();
-	//	}
-	//}
 	public void CreateChunk()
 	{
 		if (chunkHasBeenInitialized == false)
@@ -48,10 +45,6 @@ public class ChunkController : MonoBehaviour, IChunkManager
 			}
 			chunkHasBeenInitialized = true;
 		}
-		else
-		{
-			Debug.LogWarning("Chunkname " + gameObject.transform.name + " has already been initialized");
-		}
 	}
 
 	private GameObject CreateTile(GameObject prefabToInstantiate, int currentPosX, int currentPosY)
@@ -67,27 +60,23 @@ public class ChunkController : MonoBehaviour, IChunkManager
 
 	public void DisableAllTiles()
 	{
-		for (int tileIndex = 0; tileIndex < gameObject.transform.GetChildCount(); tileIndex++)
+		for (int tileIndex = 0; tileIndex < gameObject.transform.transform.childCount; tileIndex++)
 		{
 			gameObject.transform.GetChild(tileIndex).gameObject.SetActive(false);
 		}
 		chunkHasBeenDisabled = true;
 	}
 
+
 	public void EnableAllTiles()
 	{
 		if (chunkHasBeenDisabled)
 		{
-			for (int tileIndex = 0; tileIndex < gameObject.transform.GetChildCount(); tileIndex++)
+			for (int tileIndex = 0; tileIndex < gameObject.transform.transform.childCount; tileIndex++)
 			{
 				gameObject.transform.GetChild(tileIndex).gameObject.SetActive(true);
 			}
 		}
-		else
-		{
-			CreateChunk(); //Debug.LogError("This chunk isn't disabled my dude.");
-		}
-		
 		chunkHasBeenDisabled = false;
 	}
 }
