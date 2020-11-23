@@ -8,12 +8,18 @@ using Unity.Entities;
 
 public class ChunkController : MonoBehaviour, IChunkManager
 {
+	public GameObject tileContainer;
+
 	public int chunkRangeXStart, chunkRangeXEnd;
 	public int chunkRangeYStart, chunkRangeYEnd;
 
 	private bool chunkHasBeenInitialized = false;
 	private bool chunkHasBeenDisabled = false;
 
+	public void Awake()
+	{
+		tileContainer = transform.GetChild(0).gameObject; // First and the only child after initialization is the tileContainer
+	}
 	public void InitializeVariables(int chunkRangeXStart, int chunkRangeXEnd, int chunkRangeYStart, int chunkRangeYEnd)
 	{
 		this.chunkRangeXStart = chunkRangeXStart;
@@ -22,7 +28,7 @@ public class ChunkController : MonoBehaviour, IChunkManager
 		this.chunkRangeYEnd = chunkRangeYEnd;
 	}
 
-	public void CreateChunk()
+	public IEnumerator CreateChunk()
 	{
 		if (chunkHasBeenInitialized == false)
 		{
@@ -32,14 +38,11 @@ public class ChunkController : MonoBehaviour, IChunkManager
 				{
 					if (WorldManager.fillMap[currentPosX, currentPosY] == 1)
 					{
-						if (WorldManager.mineralMap[currentPosX, currentPosY] == 1)
+						if (WorldManager.fillMap[currentPosX, currentPosY] == 1)
 						{
-							CreateTile(WorldManager.mineralTile, currentPosX, currentPosY);
+							CreateTile(WorldManager.baseBlock, currentPosX, currentPosY, WorldManager.mineralMap[currentPosX, currentPosY]);
 						}
-						else
-						{
-							CreateTile(WorldManager.dirtTile, currentPosX, currentPosY);
-						}
+						yield return null;
 					}
 				}
 			}
@@ -47,10 +50,23 @@ public class ChunkController : MonoBehaviour, IChunkManager
 		}
 	}
 
-	private GameObject CreateTile(GameObject prefabToInstantiate, int currentPosX, int currentPosY)
+	private GameObject CreateTile(GameObject prefabToInstantiate, int currentPosX, int currentPosY, int blockId)
 	{
 		GameObject currentTile;
-		currentTile = GameObject.Instantiate(prefabToInstantiate, new Vector3(currentPosX * WorldManager.tileLength, currentPosY * WorldManager.tileLength * (-1), 0), Quaternion.identity, transform);
+		currentTile = GameObject.Instantiate(prefabToInstantiate, new Vector3(currentPosX * WorldManager.tileLength, currentPosY * WorldManager.tileLength * (-1), 0), Quaternion.identity, tileContainer.transform);
+		currentTile.name = "dirtTile_" + currentPosX.ToString() + "_" + currentPosY.ToString();
+		Block currentBlock = (Block)currentTile.GetComponent<IBlock>();
+		currentBlock.posX = currentPosX;
+		currentBlock.posY = currentPosY;
+		currentBlock.FeedBlockData(WorldManager.GetBlockDataOfSpecificId(blockId));
+		return currentTile;
+	}
+
+	// Unused Overload
+	private GameObject _CreateTile(GameObject prefabToInstantiate, int currentPosX, int currentPosY)
+	{
+		GameObject currentTile;
+		currentTile = GameObject.Instantiate(prefabToInstantiate, new Vector3(currentPosX * WorldManager.tileLength, currentPosY * WorldManager.tileLength * (-1), 0), Quaternion.identity, tileContainer.transform);
 		currentTile.name = "dirtTile_" + currentPosX.ToString() + "_" + currentPosY.ToString();
 		Block currentBlock = (Block)currentTile.GetComponent<IBlock>();
 		currentBlock.posX = currentPosX;
@@ -58,25 +74,26 @@ public class ChunkController : MonoBehaviour, IChunkManager
 		return currentTile;
 	}
 
-	public void DisableAllTiles()
+	public IEnumerator DisableAllTiles()
 	{
-		for (int tileIndex = 0; tileIndex < gameObject.transform.transform.childCount; tileIndex++)
-		{
-			gameObject.transform.GetChild(tileIndex).gameObject.SetActive(false);
-		}
+		tileContainer.SetActive(false);
 		chunkHasBeenDisabled = true;
+		yield return null;
 	}
 
 
-	public void EnableAllTiles()
+	public IEnumerator EnableAllTiles()
 	{
 		if (chunkHasBeenDisabled)
 		{
-			for (int tileIndex = 0; tileIndex < gameObject.transform.transform.childCount; tileIndex++)
-			{
-				gameObject.transform.GetChild(tileIndex).gameObject.SetActive(true);
-			}
+			tileContainer.SetActive(true);
+			yield return null;
+		}
+		else if (chunkHasBeenDisabled == false && chunkHasBeenInitialized == false)
+		{
+			StartCoroutine(CreateChunk());
 		}
 		chunkHasBeenDisabled = false;
+		
 	}
 }

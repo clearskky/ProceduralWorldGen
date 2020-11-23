@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff7473383979dd546b7de63e77b729a2, type: 3}
-  m_Name: JadeBlock
+  m_Name: BedrockBlock
   m_EditorClassIdentifier: 
-  blockTypeId: 6
-  blockSprite: {fileID: 21300000, guid: 850f8f12fb4c3aa4eb2ad44f610ed405, type: 3}
-  vendorName: 1
+  blockTypeId: 51
+  blockSprite: {fileID: 21300000, guid: e58e44fa39433194fa4387b2912f3d66, type: 3}
+  vendorName: Bedrock
   weight: 0
-  sellValue: 2500
-  minable: 1
+  sellValue: 0
+  minable: 0

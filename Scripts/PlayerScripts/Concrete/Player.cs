@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,9 +23,10 @@ public class Player : MonoBehaviour, IPlayer
         }
     }
 
-    private float raycastDistance;
-    public int movementSpeed;
-    public IInputHandler inputHandler;
+    [SerializeField] private float raycastDistance;
+    [SerializeField] private int movementSpeed;
+    [SerializeField] private IInputHandler inputHandler;
+    private PlayerInventory inventory;
 
     void Start()
     {
@@ -52,6 +54,11 @@ public class Player : MonoBehaviour, IPlayer
                 hit.collider.gameObject.GetComponent<IBlock>().GetMined();
             }
         }
+    }
+
+    internal void AddBrokenBlockToInventory()
+    {
+        throw new NotImplementedException();
     }
 
     private void MovePlayerAcordingToInput()

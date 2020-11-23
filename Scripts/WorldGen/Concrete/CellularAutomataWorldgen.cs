@@ -16,8 +16,21 @@ public class CellularAutomataWorldgen : MonoBehaviour
 	[Range(0, 100)]
 	public int mineralPercentage;
 
+	public float bronzeWeight, bronzeWeightDepthMult;
+	public float ironWeight, ironWeightDepthMult;
+	public float silverWeight, silverWeightDepthMult;
+	public float goldWeight, goldWeightDepthMult;
+	public float jadeWeight, jadeWeightDepthMult;
+	public float lithiumWeight, lithiumWeightDepthMult;
+	public float uraniumWeight, uraniumWeightDepthMult;
+	public float newagWeight, newagWeightDepthMult;
+	private float bedrockWeight = 0;
+
+
 	int[,] smoothedFillMap;
 	int[,] smoothedMineralMap;
+
+
 
 
 	Renderer renderer;
@@ -111,13 +124,20 @@ public class CellularAutomataWorldgen : MonoBehaviour
 		{
 			for (int y = 0; y < WorldManager.height; y++)
 			{
-				if (x == 0 || x == WorldManager.width - 1 || y == 0 || y == WorldManager.height - 1)
+				if (x == WorldManager.width - 1 || x == 0 || y == WorldManager.height - 1) // Is the block on the bottom or the sides?
 				{
-					WorldManager.mineralMap[x, y] = 0; // 1 means the block is a mineral block, 0 means its not.
+					WorldManager.mineralMap[x, y] = 51; // 51 is the id of the bedrock which cannot be mined
 				}
 				else if (WorldManager.fillMap[x,y] == 1)
 				{
-					WorldManager.mineralMap[x, y] = (pseudoRandomGenerator.Next(0, 100) < mineralPercentage) ? 1 : 0;
+					if((pseudoRandomGenerator.Next(0, 100) < mineralPercentage) ? true : false)
+					{
+						WorldManager.mineralMap[x, y] = DetermineMineralType(y);
+					}
+					else
+					{
+						WorldManager.mineralMap[x, y] = 1;
+					}
 				}
 				else
 				{
@@ -125,6 +145,56 @@ public class CellularAutomataWorldgen : MonoBehaviour
 				}
 			}
 		}
+	}
+
+	private int DetermineMineralType(int currentDepth)
+	{
+		float[] weights = new float[] // The array index corresponds to a block id
+		{
+			0,
+			bronzeWeight    + bronzeWeightDepthMult * currentDepth,
+			ironWeight      + ironWeightDepthMult * currentDepth,
+			silverWeight    + silverWeightDepthMult * currentDepth,
+			goldWeight      + goldWeightDepthMult * currentDepth,
+			jadeWeight      + jadeWeightDepthMult * currentDepth,
+			lithiumWeight   + lithiumWeightDepthMult * currentDepth,
+			uraniumWeight   + uraniumWeightDepthMult * currentDepth,
+			newagWeight     + newagWeightDepthMult  * currentDepth
+		};
+
+		for (int index = 0; index < weights.Length; index++) // Weights cannot be less than 0
+		{
+			if (weights[index] <= 0f)
+			{
+				weights[index] = 0f;
+			}
+		}
+
+		// Get the total sum of all the weights.
+		float totalWeight = 0;
+		for (int i = 0; i < weights.Length; ++i)
+		{
+			totalWeight += weights[i];
+		}
+
+		// Step through all the possibilities, one by one, checking to see if each one is selected.
+		int weightIndex = 0;
+		int lastIndex = weights.Length - 1;
+		while (weightIndex < lastIndex)
+		{
+			// Do a probability check with a likelihood of weights[index] / weightSum.
+			if (weights[weightIndex] > UnityEngine.Random.Range(0, totalWeight))
+			{
+				return weightIndex;
+			}
+
+			// Remove the last item from the sum of total untested weights and try again.
+			weightIndex++;
+			totalWeight -= weights[weightIndex];
+		}
+
+		// No other item was selected, so return very last index.
+		return weightIndex;
 	}
 
 	public void InstantiateChunkControllers()
@@ -150,20 +220,13 @@ public class CellularAutomataWorldgen : MonoBehaviour
 			{
 				if (WorldManager.fillMap[currentPosX, currentPosY] == 1)
 				{
-					if (WorldManager.mineralMap[currentPosX, currentPosY] == 1)
-					{
-						CreateTile(WorldManager.mineralTile, currentPosX, currentPosY);
-					}
-					else
-					{
-						CreateTile(WorldManager.dirtTile, currentPosX, currentPosY);
-					}
+					CreateTile(WorldManager.baseBlock, currentPosX, currentPosY, WorldManager.mineralMap[currentPosX, currentPosY]);
 				}
 			}
 		}
 	}
 
-	private GameObject CreateTile(GameObject prefabToInstantiate, int currentPosX, int currentPosY)
+	private GameObject CreateTile(GameObject prefabToInstantiate, int currentPosX, int currentPosY, int blockId)
 	{
 		GameObject currentTile;
 		currentTile = GameObject.Instantiate(prefabToInstantiate, new Vector3(currentPosX * WorldManager.tileLength, currentPosY * WorldManager.tileLength * (-1), 0), Quaternion.identity, transform);
@@ -171,6 +234,7 @@ public class CellularAutomataWorldgen : MonoBehaviour
 		Block currentBlock = (Block)currentTile.GetComponent<IBlock>();
 		currentBlock.posX = currentPosX;
 		currentBlock.posY = currentPosY;
+		currentBlock.FeedBlockData(WorldManager.GetBlockDataOfSpecificId(blockId));
 		return currentTile;
 	}
 	public void GenerateTexture()

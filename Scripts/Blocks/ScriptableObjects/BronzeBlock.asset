@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff7473383979dd546b7de63e77b729a2, type: 3}
-  m_Name: JadeBlock
+  m_Name: BronzeBlock
   m_EditorClassIdentifier: 
-  blockTypeId: 6
-  blockSprite: {fileID: 21300000, guid: 850f8f12fb4c3aa4eb2ad44f610ed405, type: 3}
-  vendorName: 1
-  weight: 0
-  sellValue: 2500
+  blockTypeId: 2
+  blockSprite: {fileID: 21300000, guid: 76b90cd8fcfb6234a86227a7e6b246dc, type: 3}
+  vendorName: Bronze
+  weight: 1
+  sellValue: 100
   minable: 1

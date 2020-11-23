@@ -7,15 +7,11 @@ public class DynamicCameraOcclusion : MonoBehaviour
 {
     private void OnTriggerExit2D(Collider2D chunk) // Calling it chunk because Camera can only collide with chunk controllers
     {
-        Debug.Log("Goodnight");
-        JobHandle jobHandle = chunk.gameObject.GetComponent<ChunkController>().DisableAllTiles();
-        jobHandle.Complete();
+        StartCoroutine(chunk.gameObject.GetComponent<ChunkController>().DisableAllTiles());
     }
 
     private void OnTriggerEnter2D(Collider2D chunk)
     {
-        Debug.Log("Hello ");
-        JobHandle jobHandle = chunk.GetComponent<ChunkController>().EnableAllTiles();
-        jobHandle.Complete();
+        StartCoroutine(chunk.GetComponent<ChunkController>().EnableAllTiles());
     }
 }

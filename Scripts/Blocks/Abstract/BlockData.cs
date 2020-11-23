@@ -6,8 +6,9 @@ using UnityEngine;
 public class BlockData : ScriptableObject
 {
     public int blockTypeId;
-    public string vendorName;
-    public int sellValue;
     public Sprite blockSprite;
-    public float toughness;
+    public string vendorName;
+    public int weight;
+    public int sellValue;
+    public bool minable;
 }
