@@ -10,23 +10,20 @@ public class Block : MonoBehaviour, IBlock
     [SerializeField] private Sprite  blockSprite;
     [SerializeField] private bool   minable;
 
-    //public BlockData blockData;
-    public event EventHandler<OnBlockMinedEventArgs> OnBlockMined;
+    public static event EventHandler<OnBlockMinedEventArgs> OnBlockMined;
 
-    public void FeedBlockData(BlockData blockData)
+    public void FeedBlockData(BlockData blockData) // Block data is fed to the block by the CellularAutomataWorldgen class, this is how it obtains the bare minimum properties
     {
-        //this.blockData = blockDataToFeed
         blockTypeId = blockData.blockTypeId;
         GetComponent<SpriteRenderer>().sprite = blockData.blockSprite;
         minable   = blockData.minable;
-        OnBlockMined += MainGameCanvasManager.Instance.OnBlockMined;
     }
 
     public void GetMined()
     {
         if (minable)
         {
-            OnBlockMined(this, new OnBlockMinedEventArgs() { posX = posX, posY = posY, blockTypeId = blockTypeId });
+            OnBlockMined?.Invoke(this, new OnBlockMinedEventArgs() { posX = posX, posY = posY, blockTypeId = blockTypeId });
             Destroy(gameObject);
         } else
         {

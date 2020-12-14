@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using Newtonsoft.Json;
 
 public class CellularAutomataWorldgen : MonoBehaviour
 {
@@ -28,7 +29,7 @@ public class CellularAutomataWorldgen : MonoBehaviour
 
 
 	int[,] smoothedFillMap;
-	int[,] smoothedMineralMap;
+	//int[,] smoothedMineralMap;
 
 
 
@@ -37,10 +38,20 @@ public class CellularAutomataWorldgen : MonoBehaviour
 
 	void Start()
 	{
-		GenerateFillMap();
-		GenerateMineralMap();
+		if (PlayerPrefs.GetInt("worldHasBeenInitialized", 0) != 1)
+		{
+			GenerateFillMap();
+			GenerateMineralMap();
+		}
+		
 		InstantiateChunkControllers();
 		//InstantiateMap();
+
+		if (PlayerPrefs.GetInt("worldHasBeenInitialized", 0) != 1)
+		{
+			PlayerPrefs.SetInt("worldHasBeenInitialized", 1);
+			PlayerPrefs.Save();
+		}
 	}
 
 	void GenerateFillMap()
@@ -87,7 +98,9 @@ public class CellularAutomataWorldgen : MonoBehaviour
 			}
 			WorldManager.fillMap = smoothedFillMap;
 		}
-		
+
+		PlayerPrefs.SetString("fillMap", JsonConvert.SerializeObject(WorldManager.fillMap));
+		PlayerPrefs.Save();
 	}
 
 	int GetSurroundingWallCount(int gridX, int gridY)
@@ -128,23 +141,26 @@ public class CellularAutomataWorldgen : MonoBehaviour
 				{
 					WorldManager.mineralMap[x, y] = 51; // 51 is the id of the bedrock which cannot be mined
 				}
-				else if (WorldManager.fillMap[x,y] == 1)
+				else if (WorldManager.fillMap[x,y] == 1) // There is a block here
 				{
 					if((pseudoRandomGenerator.Next(0, 100) < mineralPercentage) ? true : false)
 					{
 						WorldManager.mineralMap[x, y] = DetermineMineralType(y);
 					}
-					else
+					else // Its not a mineral, give it the id of a DirtBlock
 					{
 						WorldManager.mineralMap[x, y] = 1;
 					}
 				}
-				else
+				else // This spot on the grid isn't filled at all
 				{
 					WorldManager.mineralMap[x, y] = 0;
 				}
 			}
 		}
+
+		PlayerPrefs.SetString("mineralMap", JsonConvert.SerializeObject(WorldManager.mineralMap));
+		PlayerPrefs.Save();
 	}
 
 	private int DetermineMineralType(int currentDepth)
