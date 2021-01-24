@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff7473383979dd546b7de63e77b729a2, type: 3}
   m_Name: LithiumBlock
   m_EditorClassIdentifier: 
-  blockTypeId: 7
+  blockTypeId: 6
   blockSprite: {fileID: 21300000, guid: dec538bfa86108143ad7153c0fa90cab, type: 3}
-  vendorName: 
-  weight: 0
-  sellValue: 0
+  vendorName: Lithium
+  weight: 4
+  sellValue: 2000
   minable: 1

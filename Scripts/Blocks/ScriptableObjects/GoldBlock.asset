@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff7473383979dd546b7de63e77b729a2, type: 3}
   m_Name: GoldBlock
   m_EditorClassIdentifier: 
-  blockTypeId: 5
+  blockTypeId: 4
   blockSprite: {fileID: 21300000, guid: 15eba139df8aeb544a6b09aaf6f09edb, type: 3}
   vendorName: Gold
-  weight: 1
-  sellValue: 1000
+  weight: 2
+  sellValue: 250
   minable: 1

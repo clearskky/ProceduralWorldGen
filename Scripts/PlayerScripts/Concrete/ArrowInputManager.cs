@@ -4,11 +4,10 @@ using UnityEngine;
 
 public class ArrowInputManager : MonoBehaviour, IInputHandler
 {
-    private float x, y;
-    public Vector2 ReceiveInput()
+    [Range(0,1)]
+    public float horizontalMultiplier;
+    public void SendMovementInput()
     {
-        return new Vector2();
+        Player.Instance.MovePlayerAcordingToInput(new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
     }
-
-   
 }

@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff7473383979dd546b7de63e77b729a2, type: 3}
   m_Name: UraniumBlock
   m_EditorClassIdentifier: 
-  blockTypeId: 8
+  blockTypeId: 7
   blockSprite: {fileID: 21300000, guid: 8070330cbf50ff3419b53ad4aabbe3a4, type: 3}
-  vendorName: 
-  weight: 0
-  sellValue: 0
+  vendorName: Uranium
+  weight: 6
+  sellValue: 5000
   minable: 1

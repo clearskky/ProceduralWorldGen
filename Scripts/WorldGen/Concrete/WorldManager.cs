@@ -9,6 +9,7 @@ public class WorldManager : MonoBehaviour
     public static int width;
     public static int height;
     public static GameObject baseBlock;
+    public CellularAutomataWorldgen worldGen;
 
     [SerializeField] private int _width, _height;
     [SerializeField] private GameObject _baseBlock;
@@ -40,6 +41,8 @@ public class WorldManager : MonoBehaviour
             _instance = this;
         }
 
+        Block.OnBlockMined += Block_OnBlockMined; // Subscribe to the static onblockmined event of the Block class
+        worldGen = GetComponent<CellularAutomataWorldgen>();
         width = _width;
         height = _height;
         baseBlock = _baseBlock;
@@ -48,27 +51,37 @@ public class WorldManager : MonoBehaviour
 
         if (PlayerPrefs.GetInt("worldHasBeenInitialized", 0) == 1)
         {
+            Debug.Log("World has already been initialized, pulling data from playerprefs.");
+
             string fillMapJson = PlayerPrefs.GetString("fillMap");
             fillMap = JsonConvert.DeserializeObject<int[,]>(fillMapJson);
+            Debug.Log("Fill map obtained: " + PlayerPrefs.GetString("fillMap"));
 
             string mineralMapJson = PlayerPrefs.GetString("mineralMap");
             mineralMap = JsonConvert.DeserializeObject<int[,]>(mineralMapJson);
+            Debug.Log("Mineral map obtained." + PlayerPrefs.GetString("mineralMap"));
         }
         else
         {
+            Debug.Log("Initializing world for the first time.");
             fillMap = new int[width, height];
             mineralMap = new int[width, height];
+            worldGen.InitializeWorld();
         }
+
         deltaMap = fillMap;
-        
+
+        Debug.Log("Instantiating World");
+        worldGen.InstantiateWorld();
+
         Block.OnBlockMined += Block_OnBlockMined; // Subscribe to the static onblockmined event of the Block class
     }
 
     private void Block_OnBlockMined(object sender, OnBlockMinedEventArgs blockData)
     {
         deltaMap[blockData.posX, blockData.posY] = 0;
-        Debug.Log("You've mined the x:" + blockData.posX + " y:" + blockData.posY + " block brother.");
-        SaveGame();
+        Debug.Log("You've mined the x:" + blockData.posX + " y:" + blockData.posY + " block");
+        //SaveGame();
     }
 
     public void UpdateDeltaMap(int xCoordinate, int yCoordinate)

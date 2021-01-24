@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff7473383979dd546b7de63e77b729a2, type: 3}
   m_Name: IronBlock
   m_EditorClassIdentifier: 
-  blockTypeId: 3
+  blockTypeId: 2
   blockSprite: {fileID: 21300000, guid: f72c6bea91dc1fc4186d114cbbdc2a73, type: 3}
   vendorName: Iron
   weight: 1
-  sellValue: 200
+  sellValue: 30
   minable: 1

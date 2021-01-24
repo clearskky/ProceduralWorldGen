@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff7473383979dd546b7de63e77b729a2, type: 3}
   m_Name: NewagBlock
   m_EditorClassIdentifier: 
-  blockTypeId: 9
+  blockTypeId: 8
   blockSprite: {fileID: 21300000, guid: ea2edeccbd53df74381ae5631e3c9c90, type: 3}
-  vendorName: 
-  weight: 0
-  sellValue: 0
+  vendorName: New Age Crystal
+  weight: 8
+  sellValue: 20000
   minable: 1

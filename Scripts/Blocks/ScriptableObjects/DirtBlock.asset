@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff7473383979dd546b7de63e77b729a2, type: 3}
   m_Name: DirtBlock
   m_EditorClassIdentifier: 
-  blockTypeId: 1
+  blockTypeId: 0
   blockSprite: {fileID: 21300000, guid: 7a7a63f1998198646bfc96367dce9394, type: 3}
   vendorName: Dirt
   weight: 0

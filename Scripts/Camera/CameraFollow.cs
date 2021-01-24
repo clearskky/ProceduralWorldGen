@@ -14,26 +14,30 @@ public class CameraFollow : MonoBehaviour
     private float yBoundryMax;
     private float xBoundryMin;
     private float xBoundryMax;
+    private float halfScreenWidthInWorldSpace;
 
     void Start()
     {
+        float height = Camera.main.orthographicSize * 2.0f;
+        float width = height * Camera.main.aspect;
+        halfScreenWidthInWorldSpace = width / 2;
+
         startingPosZ = transform.position.z;
         player = Player.Instance;
 
         yBoundryMin = WorldManager.tileLength * WorldManager.height * -1;
-        yBoundryMax = WorldManager.tileLength * 30;
-        xBoundryMin = 0;
-        xBoundryMax = WorldManager.tileLength * WorldManager.width;
-
-        Debug.Log(yBoundryMin);
-        Debug.Log(yBoundryMax);
-        Debug.Log(xBoundryMin);
-        Debug.Log(xBoundryMax);
+        yBoundryMax = WorldManager.tileLength * 20;
+        xBoundryMin = halfScreenWidthInWorldSpace;
+        xBoundryMax = WorldManager.tileLength * WorldManager.width - halfScreenWidthInWorldSpace - 5;
     }
 
-    void LateUpdate()
+    void FixedUpdate()
     {
         FollowPlayer();
+    }
+
+    private void LateUpdate()
+    {
         ClampCameraPositionWithinBoundaries();
     }
 

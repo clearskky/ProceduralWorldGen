@@ -18,7 +18,7 @@ public class ChunkController : MonoBehaviour, IChunkManager
 
 	public void Awake()
 	{
-		tileContainer = transform.GetChild(0).gameObject; // First and the only child after initialization is the tileContainer
+		tileContainer = transform.GetChild(0).gameObject; // First and the only child after instantiation is the tileContainer
 	}
 	public void InitializeVariables(int chunkRangeXStart, int chunkRangeXEnd, int chunkRangeYStart, int chunkRangeYEnd)
 	{
@@ -38,23 +38,24 @@ public class ChunkController : MonoBehaviour, IChunkManager
 				{
 					if (WorldManager.fillMap[currentPosX, currentPosY] == 1)
 					{
-						if (WorldManager.fillMap[currentPosX, currentPosY] == 1)
-						{
-							CreateTile(WorldManager.baseBlock, currentPosX, currentPosY, WorldManager.mineralMap[currentPosX, currentPosY]);
-						}
+						CreateTile(WorldManager.baseBlock, currentPosX, currentPosY, WorldManager.mineralMap[currentPosX, currentPosY]);
 						yield return null;
 					}
+					
 				}
 			}
 			chunkHasBeenInitialized = true;
 		}
+
 	}
 
 	private GameObject CreateTile(GameObject prefabToInstantiate, int currentPosX, int currentPosY, int blockId)
 	{
 		GameObject currentTile;
-		currentTile = GameObject.Instantiate(prefabToInstantiate, new Vector3(currentPosX * WorldManager.tileLength, currentPosY * WorldManager.tileLength * (-1), 0), Quaternion.identity, tileContainer.transform);
-		currentTile.name = "dirtTile_" + currentPosX.ToString() + "_" + currentPosY.ToString();
+		currentTile = GameObject.Instantiate(prefabToInstantiate, new Vector3(currentPosX * WorldManager.tileLength, 
+																			  currentPosY * WorldManager.tileLength * (-1), 0), 
+																			  Quaternion.identity, tileContainer.transform);
+		currentTile.name = "tile_" + currentPosX.ToString() + "_" + currentPosY.ToString();
 		Block currentBlock = (Block)currentTile.GetComponent<IBlock>();
 		currentBlock.posX = currentPosX;
 		currentBlock.posY = currentPosY;

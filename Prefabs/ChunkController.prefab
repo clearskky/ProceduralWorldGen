@@ -76,7 +76,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9284fcfbe621ed4d92d7602f4819473, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chunkContainer: {fileID: 136194663202119670}
+  tileContainer: {fileID: 0}
   chunkRangeXStart: 0
   chunkRangeXEnd: 0
   chunkRangeYStart: 0

@@ -31,24 +31,23 @@ public class CellularAutomataWorldgen : MonoBehaviour
 	int[,] smoothedFillMap;
 	//int[,] smoothedMineralMap;
 
-
-
-
 	Renderer renderer;
 
-	void Start()
+	public void InitializeWorld()
 	{
-		if (PlayerPrefs.GetInt("worldHasBeenInitialized", 0) != 1)
-		{
-			GenerateFillMap();
-			GenerateMineralMap();
-		}
-		
+		GenerateFillMap();
+		GenerateMineralMap();
+		//Debug.Log("Fill and Mineral maps have been initialized for the first time, saving them to playerprefs.");
+	}
+
+	public void InstantiateWorld()
+	{
 		InstantiateChunkControllers();
 		//InstantiateMap();
 
 		if (PlayerPrefs.GetInt("worldHasBeenInitialized", 0) != 1)
 		{
+			Debug.Log("World has been initialized for the first time, saving to playerPrefs.");
 			PlayerPrefs.SetInt("worldHasBeenInitialized", 1);
 			PlayerPrefs.Save();
 		}
@@ -99,6 +98,7 @@ public class CellularAutomataWorldgen : MonoBehaviour
 			WorldManager.fillMap = smoothedFillMap;
 		}
 
+		Debug.Log("Saving Fill Map.");
 		PlayerPrefs.SetString("fillMap", JsonConvert.SerializeObject(WorldManager.fillMap));
 		PlayerPrefs.Save();
 	}
@@ -137,7 +137,7 @@ public class CellularAutomataWorldgen : MonoBehaviour
 		{
 			for (int y = 0; y < WorldManager.height; y++)
 			{
-				if (x == WorldManager.width - 1 || x == 0 || y == WorldManager.height - 1) // Is the block on the bottom or the sides?
+				if (x == WorldManager.width - 1 || x == 0 || y == WorldManager.height - 1 || (x <= 20 && y == 0) || (x >= 25 && y == 0)) // Is the block on the bottom or the sides?
 				{
 					WorldManager.mineralMap[x, y] = 51; // 51 is the id of the bedrock which cannot be mined
 				}
@@ -147,9 +147,9 @@ public class CellularAutomataWorldgen : MonoBehaviour
 					{
 						WorldManager.mineralMap[x, y] = DetermineMineralType(y);
 					}
-					else // Its not a mineral, give it the id of a DirtBlock
+					else // Its not a mineral, give it the id of a DirtBlock, which is 0 
 					{
-						WorldManager.mineralMap[x, y] = 1;
+						WorldManager.mineralMap[x, y] = 0;
 					}
 				}
 				else // This spot on the grid isn't filled at all
@@ -167,7 +167,7 @@ public class CellularAutomataWorldgen : MonoBehaviour
 	{
 		float[] weights = new float[] // The array index corresponds to a block id
 		{
-			0,
+			0, // The algorithm will automatically pass this part because no mineral has the id of 0, id of bronze starts from 1
 			bronzeWeight    + bronzeWeightDepthMult * currentDepth,
 			ironWeight      + ironWeightDepthMult * currentDepth,
 			silverWeight    + silverWeightDepthMult * currentDepth,
@@ -175,7 +175,7 @@ public class CellularAutomataWorldgen : MonoBehaviour
 			jadeWeight      + jadeWeightDepthMult * currentDepth,
 			lithiumWeight   + lithiumWeightDepthMult * currentDepth,
 			uraniumWeight   + uraniumWeightDepthMult * currentDepth,
-			newagWeight     + newagWeightDepthMult  * currentDepth
+			newagWeight     + newagWeightDepthMult * currentDepth
 		};
 
 		for (int index = 0; index < weights.Length; index++) // Weights cannot be less than 0
@@ -193,24 +193,24 @@ public class CellularAutomataWorldgen : MonoBehaviour
 			totalWeight += weights[i];
 		}
 
+		
 		// Step through all the possibilities, one by one, checking to see if each one is selected.
-		int weightIndex = 0;
-		int lastIndex = weights.Length - 1;
-		while (weightIndex < lastIndex)
+		for (int weightIndex = 0; weightIndex < weights.Length; weightIndex++)
 		{
 			// Do a probability check with a likelihood of weights[index] / weightSum.
 			if (weights[weightIndex] > UnityEngine.Random.Range(0, totalWeight))
 			{
 				return weightIndex;
 			}
-
-			// Remove the last item from the sum of total untested weights and try again.
-			weightIndex++;
-			totalWeight -= weights[weightIndex];
+			else
+			{
+				// Remove the last item from the sum of total untested weights and try again.
+				totalWeight -= weights[weightIndex];
+			}
 		}
 
-		// No other item was selected, so return very last index.
-		return weightIndex;
+		// No block made the cut so return the very last index.
+		return Convert.ToInt32(weights[weights.Length - 1]);
 	}
 
 	public void InstantiateChunkControllers()
@@ -220,9 +220,12 @@ public class CellularAutomataWorldgen : MonoBehaviour
 		{
 			for (int currentPosY = 0; currentPosY < WorldManager.fillMap.GetUpperBound(1); currentPosY += chunkManagerHeight)
 			{
-				lastCreatedObject = GameObject.Instantiate(pfab_chunkManager, new Vector3(currentPosX * WorldManager.tileLength, currentPosY * WorldManager.tileLength * (-1), 0), Quaternion.identity, transform);
+				lastCreatedObject = GameObject.Instantiate(pfab_chunkManager, new Vector3(currentPosX * WorldManager.tileLength, 
+														   currentPosY * WorldManager.tileLength * (-1), 0), 
+														   Quaternion.identity, transform);
 				ChunkController lastCreatedController = lastCreatedObject.GetComponent<ChunkController>();
-				lastCreatedController.InitializeVariables(currentPosX, currentPosX + chunkManagerWidth, currentPosY, currentPosY + chunkManagerHeight);
+				lastCreatedController.InitializeVariables(currentPosX, currentPosX + chunkManagerWidth, currentPosY, 
+														  currentPosY + chunkManagerHeight);
 			}
 		}
 	}
@@ -245,7 +248,9 @@ public class CellularAutomataWorldgen : MonoBehaviour
 	private GameObject CreateTile(GameObject prefabToInstantiate, int currentPosX, int currentPosY, int blockId)
 	{
 		GameObject currentTile;
-		currentTile = GameObject.Instantiate(prefabToInstantiate, new Vector3(currentPosX * WorldManager.tileLength, currentPosY * WorldManager.tileLength * (-1), 0), Quaternion.identity, transform);
+		currentTile = GameObject.Instantiate(prefabToInstantiate, new Vector3(currentPosX * WorldManager.tileLength, 
+																			  currentPosY * WorldManager.tileLength * (-1), 0), 
+																			  Quaternion.identity, transform);
 		currentTile.name = "dirtTile_" + currentPosX.ToString() + "_" + currentPosY.ToString();
 		Block currentBlock = (Block)currentTile.GetComponent<IBlock>();
 		currentBlock.posX = currentPosX;

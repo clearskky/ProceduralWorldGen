@@ -12,6 +12,7 @@ public class DynamicCameraOcclusion : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D chunk)
     {
+        //Debug.Log("Enable tiles");
         StartCoroutine(chunk.GetComponent<ChunkController>().EnableAllTiles());
     }
 }
