@@ -55,7 +55,7 @@ public class CanvasManager : MonoBehaviour, ICanvasManager
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (activeSceneName == "SampleScene" && lastActivePanel == null)
+            if (activeSceneName == "Game" && lastActivePanel == null)
             {
                 AudioManager.Instance.PlayButtonPressClip();
                 //GameEventManager.Instance.TogglePauseMenu();
@@ -64,9 +64,10 @@ public class CanvasManager : MonoBehaviour, ICanvasManager
             {
                 Debug.LogWarning("Nowhere to go back to");
             }
-            else if (lastActivePanel.previousPanelType == TogglablePanelType.none)
+            else if (lastActivePanel.previousPanelType == TogglablePanelType.PlayerInterface)
             {
                 AudioManager.Instance.PlayButtonPressClip();
+                Time.timeScale = 1;
                 //GameEventManager.Instance.TogglePauseMenu();
             }
             else

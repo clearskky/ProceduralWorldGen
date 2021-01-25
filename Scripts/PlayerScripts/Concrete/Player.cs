@@ -9,6 +9,7 @@ public class Player : MonoBehaviour, IPlayer
     [SerializeField] private float raycastDistance;
     [SerializeField] private int movementSpeed;
     [SerializeField] private IInputHandler inputHandler;
+    [SerializeField] private Dictionary<int,int> inventory;
     private Rigidbody2D rb;
 
     //public float maxVelocity;
@@ -21,17 +22,18 @@ public class Player : MonoBehaviour, IPlayer
 
     public int baseStorage;
     public int maxStorage;
-    private int currentStorage;
+    public int currentStorage;
     public int storageLevel;
     //public int[] storageLevelModifiers;
 
     public float baseFuel;
     public float maxFuel;
-    [SerializeField] private float currentFuel;
+    public float currentFuel;
     public int fuelTankLevel;
     //public float[] fuelTankLevelModifiers;
 
     private List<GameObject> listOfInteractables;
+    public VignetteController vignetteController;
 
     public event EventHandler<OnInteractEventArgs> OnInteract;
     public bool playerCanInteract;
@@ -63,13 +65,20 @@ public class Player : MonoBehaviour, IPlayer
 
     void Start()
     {
-        cash = PlayerPrefs.GetFloat("cash", 100000f);
+        inventory = new Dictionary<int, int>
+        {
+            {0, 0}
+        };        
+
+        cash = PlayerPrefs.GetFloat("cash", 3f);
         AdjustCashText();
 
         miningSpeed = baseMiningSpeed + UpgradeStation.miningSpeedLevelModifiers[PlayerPrefs.GetInt("miningSpeedLevel", 0)];
 
         maxStorage = baseStorage + UpgradeStation.storageLevelModifiers[PlayerPrefs.GetInt("inventorySizeLevel", 0)];
         currentStorage = 0;
+        AdjustStorageBar();
+        //CalculateInventorySize();
 
         maxFuel = baseFuel + UpgradeStation.fuelTankLevelModifiers[PlayerPrefs.GetInt("fuelTankLevel", 0)];
         currentFuel = maxFuel;
@@ -80,7 +89,8 @@ public class Player : MonoBehaviour, IPlayer
         listOfInteractables = new List<GameObject>();
         rb = GetComponent<Rigidbody2D>();
         inputHandler = GetComponent<IInputHandler>();
-        raycastDistance = gameObject.GetComponent<BoxCollider2D>().bounds.size.x / 2f + 1.1f;
+        raycastDistance = gameObject.GetComponent<BoxCollider2D>().bounds.size.x / 2f + 1.4f;
+        fuelCanDrain = true;
     }
 
     void LateUpdate()
@@ -264,10 +274,6 @@ public class Player : MonoBehaviour, IPlayer
         }
     }
 
-    internal void AddBrokenBlockToInventory()
-    {
-        throw new NotImplementedException();
-    }
 
     public void MovePlayerAcordingToInput(Vector2 direction)
     {
@@ -287,6 +293,12 @@ public class Player : MonoBehaviour, IPlayer
 
     }
 
+    public void Refuel(float volumeToRefuel)
+    {
+        currentFuel += volumeToRefuel;
+        Mathf.Clamp(currentFuel, 0, maxFuel);
+        AdjustFuelBar();
+    }
     public void AdjustFuelBar()
     {
         fuelBar.value = currentFuel / maxFuel;
@@ -294,12 +306,13 @@ public class Player : MonoBehaviour, IPlayer
 
     public void AdjustStorageBar()
     {
-        storageBar.value = currentStorage / maxStorage;
+        storageBar.value = (float)currentStorage / (float)maxStorage;
     }
 
-    public void AdjustCash(int changeInCash)
+    public void AdjustCash(float changeInCash)
     {
         cash += changeInCash;
+        cash = Mathf.Round(cash);
         AdjustCashText();
     }
 
@@ -317,6 +330,43 @@ public class Player : MonoBehaviour, IPlayer
 
         maxFuel = baseFuel + UpgradeStation.fuelTankLevelModifiers[fuelTankLevel];
         AdjustFuelBar();
+    }
+
+    public void AddBlockToInventory(int blockId, int amount)
+    {
+        if (currentStorage + amount * WorldManager.blockDatabase[blockId].weight <= maxStorage)
+        {
+            try
+            {
+                int currentCount; // currentCount will be zero if the key id doesn't exist
+                inventory.TryGetValue(blockId, out currentCount);
+                inventory[blockId] = currentCount + amount;
+            }
+            catch (KeyNotFoundException e)
+            {
+                inventory.Add(blockId, amount);
+            }
+            currentStorage += amount * WorldManager.blockDatabase[blockId].weight;
+            AudioManager.Instance.PlayMineCompleteClip();
+            AdjustStorageBar();
+        }
+        else
+        {
+            AudioManager.Instance.PlayMineFailClip();
+            Debug.Log("You have no inventory space");
+        }
+        
+    }
+
+    public void CalculateInventorySize()
+    {
+        int totalWeight = 0;
+        foreach (var item in inventory)
+        {
+            totalWeight += item.Value * WorldManager.blockDatabase[item.Key].weight;
+        }
+        currentStorage = totalWeight;
+        AdjustStorageBar();
     }
 
     private void MovePlayerAcordingArrowKeys()

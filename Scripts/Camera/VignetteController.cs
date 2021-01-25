@@ -6,6 +6,7 @@ using UnityEngine.Rendering.PostProcessing;
 public class VignetteController : MonoBehaviour
 {
     public float vignetteDepthMultiplier;
+    public int radarLevel;
     public Camera mainCamera;
 
     private PostProcessVolume ppv;
@@ -13,11 +14,13 @@ public class VignetteController : MonoBehaviour
     
     private void Start()
     {
+        radarLevel = PlayerPrefs.GetInt("radarLevel", 0);
+        vignetteDepthMultiplier = UpgradeStation.radarLevelModifiers[radarLevel];
         ppv = GetComponent<PostProcessVolume>();
         ppv.profile.TryGetSettings(out vignette);
         vignette.intensity.value = 0f;
     }
-    void LateUpdate()
+    void FixedUpdate()
     {
         float vignetteIntensity = (Mathf.Abs(transform.position.y) / 1000f) * vignetteDepthMultiplier;
         vignetteIntensity = vignetteIntensity > 1 ? 1 : vignetteIntensity < 0 ? 0 : vignetteIntensity; // Clamp intensity to 1 if its greater than 1, clamp to 0 if its less than 0
@@ -30,5 +33,10 @@ public class VignetteController : MonoBehaviour
     public float Normalize(float value, float maxValue, float minValue) 
     { 
         return (value - minValue) / (maxValue - minValue); 
+    }
+
+    public void AdjustVignetteProperties()
+    {
+        vignetteDepthMultiplier = UpgradeStation.radarLevelModifiers[radarLevel];
     }
 }

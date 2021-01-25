@@ -80,7 +80,8 @@ public class WorldManager : MonoBehaviour
     private void Block_OnBlockMined(object sender, OnBlockMinedEventArgs blockData)
     {
         deltaMap[blockData.posX, blockData.posY] = 0;
-        Debug.Log("You've mined the x:" + blockData.posX + " y:" + blockData.posY + " block");
+        Player.Instance.AddBlockToInventory(blockData.blockTypeId, 1);
+        //Debug.Log("You've mined the x:" + blockData.posX + " y:" + blockData.posY + " block");
         //SaveGame();
     }
 

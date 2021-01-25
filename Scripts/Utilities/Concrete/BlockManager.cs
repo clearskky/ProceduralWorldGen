@@ -25,7 +25,7 @@ public class BlockManager : MonoBehaviour
         switch (eventArgs.breakerSource)
         {
             case BreakerSources.Drilling:
-                Player.Instance.AddBrokenBlockToInventory();
+                Player.Instance.AddBlockToInventory(eventArgs.blockTypeId, 1);
                 break;
             case BreakerSources.Powerup:
                 break;

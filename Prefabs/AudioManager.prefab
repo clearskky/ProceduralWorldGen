@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &5009044730911508158
+--- !u!1 &1484228966437294013
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,10 +8,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5009044730911508157}
-  - component: {fileID: 5009044730911508156}
-  - component: {fileID: 5009044730911508154}
-  - component: {fileID: 5009044730911508155}
+  - component: {fileID: 1484228966437294001}
+  - component: {fileID: 1484228966437294000}
+  - component: {fileID: 1484228966437294015}
+  - component: {fileID: 1484228966437294014}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Untagged
@@ -19,34 +19,34 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5009044730911508157
+--- !u!4 &1484228966437294001
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5009044730911508158}
+  m_GameObject: {fileID: 1484228966437294013}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 60.76238, y: 17.51852, z: -0.23112488}
+  m_LocalPosition: {x: 1090.7155, y: 457.31573, z: -1247.553}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5009044730911508156
+--- !u!114 &1484228966437294000
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5009044730911508158}
+  m_GameObject: {fileID: 1484228966437294013}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6563e14c9b9ae8340aec634b86c82a16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sfxAudioSource: {fileID: 5009044730911508154}
-  musicAudioSource: {fileID: 5009044730911508155}
+  sfxAudioSource: {fileID: 1484228966437294015}
+  musicAudioSource: {fileID: 1484228966437294014}
   sfxAudioMixer: {fileID: 24100000, guid: a5787830f24e0894d876e503d29ec86c, type: 2}
   musicAudioMixer: {fileID: 24100000, guid: 4e63307aea169d648bbfca38bcb82070, type: 2}
   miningMachineLoopClip: {fileID: 0}
@@ -55,21 +55,21 @@ MonoBehaviour:
   buyUpgradeClip: {fileID: 0}
   buyConsumableClip: {fileID: 0}
   refuelClip: {fileID: 0}
-  mainMenuMusicClip: {fileID: 0}
-  gameplayMusicClip: {fileID: 0}
-  invalidActionClip: {fileID: 0}
-  defeatClip: {fileID: 0}
-  buttonHitClip: {fileID: 0}
---- !u!82 &5009044730911508154
+  mainMenuMusicClip: {fileID: 8300000, guid: e217ca1c44025f94583cb9d478a561df, type: 3}
+  gameplayMusicClip: {fileID: 8300000, guid: 5cc98c67ab29236468953ad201ea77c4, type: 3}
+  invalidActionClip: {fileID: 8300000, guid: c7dd0b326032f79408b2d4d6359c471f, type: 3}
+  defeatClip: {fileID: 8300000, guid: 3b6fb2c16bdc24641999ba4237cbf3c5, type: 3}
+  buttonHitClip: {fileID: 8300000, guid: 42ac91c09382af040bca18cb9d9f7224, type: 3}
+--- !u!82 &1484228966437294015
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5009044730911508158}
+  m_GameObject: {fileID: 1484228966437294013}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 24300002, guid: a5787830f24e0894d876e503d29ec86c, type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
@@ -156,18 +156,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!82 &5009044730911508155
+--- !u!82 &1484228966437294014
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5009044730911508158}
+  m_GameObject: {fileID: 1484228966437294013}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 4e63307aea169d648bbfca38bcb82070, type: 2}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
