@@ -10,7 +10,7 @@ public class AudioManager : MonoBehaviour
     public AudioMixer sfxAudioMixer, musicAudioMixer;
 
     [Header("Player Clips")]
-    public AudioClip miningMachineLoopClip, mineCompleteClip, mineFailClip;
+    public AudioClip miningMachineLoopClip, mineCompleteClip, mineFailClip, mineStartClip;
 
     [Header("Vendor Clips")]
     public AudioClip sellInventoryClip, buyUpgradeClip, buyConsumableClip, refuelClip;
@@ -81,6 +81,15 @@ public class AudioManager : MonoBehaviour
     public void PlayMineCompleteClip()
     {
         sfxAudioSource.PlayOneShot(mineCompleteClip);
+    }
+    public void PlayMineStartClip()
+    {
+        sfxAudioSource.PlayOneShot(mineStartClip);
+    }
+
+    public void PlaySellInventoryClip()
+    {
+        sfxAudioSource.PlayOneShot(sellInventoryClip);
     }
 
 }

@@ -8,6 +8,6 @@ public class QuitToMainMenuButton : MonoBehaviour
     public void QuitToMainMenu()
     {
         Time.timeScale = 1;
-        SceneManager.LoadScene(1); // Main Menu
+        SceneManager.LoadScene(0); // Main Menu
     }
 }

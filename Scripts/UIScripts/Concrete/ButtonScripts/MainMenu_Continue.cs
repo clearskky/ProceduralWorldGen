@@ -7,6 +7,6 @@ public class MainMenu_Continue : MonoBehaviour, IButton
 {
     public void OnClick()
     {
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(1);
     }
 }

@@ -9,7 +9,7 @@ public class Player : MonoBehaviour, IPlayer
     [SerializeField] private float raycastDistance;
     [SerializeField] private int movementSpeed;
     [SerializeField] private IInputHandler inputHandler;
-    [SerializeField] private Dictionary<int,int> inventory;
+    public Dictionary<int,int> inventory;
     private Rigidbody2D rb;
 
     //public float maxVelocity;
@@ -70,16 +70,18 @@ public class Player : MonoBehaviour, IPlayer
             {0, 0}
         };        
 
-        cash = PlayerPrefs.GetFloat("cash", 3f);
+        cash = PlayerPrefs.GetFloat("cash", 10f);
         AdjustCashText();
+        miningSpeedLevel = PlayerPrefs.GetInt("miningSpeedLevel", 0);
+        miningSpeed = baseMiningSpeed + UpgradeStation.miningSpeedLevelModifiers[miningSpeedLevel];
 
-        miningSpeed = baseMiningSpeed + UpgradeStation.miningSpeedLevelModifiers[PlayerPrefs.GetInt("miningSpeedLevel", 0)];
-
-        maxStorage = baseStorage + UpgradeStation.storageLevelModifiers[PlayerPrefs.GetInt("inventorySizeLevel", 0)];
+        storageLevel = PlayerPrefs.GetInt("storageLevel", 0);
+        maxStorage = baseStorage + UpgradeStation.storageLevelModifiers[storageLevel];
         currentStorage = 0;
         AdjustStorageBar();
         //CalculateInventorySize();
 
+        fuelTankLevel = PlayerPrefs.GetInt("fuelTankLevel", 0);
         maxFuel = baseFuel + UpgradeStation.fuelTankLevelModifiers[PlayerPrefs.GetInt("fuelTankLevel", 0)];
         currentFuel = maxFuel;
 
@@ -91,6 +93,7 @@ public class Player : MonoBehaviour, IPlayer
         inputHandler = GetComponent<IInputHandler>();
         raycastDistance = gameObject.GetComponent<BoxCollider2D>().bounds.size.x / 2f + 1.4f;
         fuelCanDrain = true;
+
     }
 
     void LateUpdate()
@@ -103,16 +106,18 @@ public class Player : MonoBehaviour, IPlayer
         if (fuelCanDrain)
         {
             currentFuel -= 0.12f * Time.deltaTime;
+            AdjustFuelBar();
             if (currentFuel <= 0)
             {
+                fuelCanDrain = false;
                 InitiateDeathRoutine();
-            }
-            AdjustFuelBar();
+            }            
         }
     }
 
     public IEnumerator MoveTowardsMinedBlock(Vector2 targetPositionToMove, GameObject blockToMine)
     {
+        AudioManager.Instance.PlayMineStartClip();
         playerCanInteract   = false;
         playerCanMove       = false;
         playerCanMine       = false;
@@ -134,6 +139,7 @@ public class Player : MonoBehaviour, IPlayer
         playerCanInteract   = true;
         playerCanMove       = true;
         playerCanMine       = true;
+        AudioManager.Instance.sfxAudioSource.Stop();
     }
 
     public void MineDownwards()
@@ -181,8 +187,10 @@ public class Player : MonoBehaviour, IPlayer
 
             if (hit.collider != null)
             {
+                
                 GameObject blockToMine = hit.collider.gameObject;
                 StartCoroutine(MoveTowardsMinedBlock(targetPositionToMove, blockToMine));
+
                 //blockToMine.GetComponent<IBlock>().GetMined();
             }
         }
@@ -290,7 +298,9 @@ public class Player : MonoBehaviour, IPlayer
 
     public void InitiateDeathRoutine()
     {
-
+        AudioManager.Instance.musicAudioSource.Stop();
+        AudioManager.Instance.PlayDefeatClip();
+        CanvasManager.Instance.EnableSpecificPanel(TogglablePanelType.EndGamePanel);
     }
 
     public void Refuel(float volumeToRefuel)
@@ -347,13 +357,12 @@ public class Player : MonoBehaviour, IPlayer
                 inventory.Add(blockId, amount);
             }
             currentStorage += amount * WorldManager.blockDatabase[blockId].weight;
-            AudioManager.Instance.PlayMineCompleteClip();
             AdjustStorageBar();
         }
         else
         {
+            AudioManager.Instance.sfxAudioSource.Stop();
             AudioManager.Instance.PlayMineFailClip();
-            Debug.Log("You have no inventory space");
         }
         
     }

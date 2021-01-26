@@ -14,8 +14,7 @@ public class SavePoint : MonoBehaviour, IInteractable
 
     public void OnInteract(object sender, OnInteractEventArgs playerData)
     {
-        Debug.Log("Saving the game");
-        WorldManager.SaveGame();
+        CanvasManager.Instance.EnableSpecificPanel(TogglablePanelType.SavePanel);
     }
 
     public void OnTriggerEnter2D(Collider2D actor) // Actor refers to the player object as a whole
@@ -31,5 +30,11 @@ public class SavePoint : MonoBehaviour, IInteractable
         Player playerCharacter = actor.GetComponent<Player>();
         playerCharacter.OnInteract -= OnInteract;
         //playerCharacter.RemoveObjectFromListOfInteractables(this.gameObject);
+    }
+
+    public void SaveTheGame()
+    {
+        WorldManager.SaveGame();
+        CanvasManager.Instance.EnableSpecificPanel(TogglablePanelType.PlayerInterface);
     }
 }

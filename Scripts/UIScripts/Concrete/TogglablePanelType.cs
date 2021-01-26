@@ -14,5 +14,6 @@ public enum TogglablePanelType
     EndGamePanel,
     QuitToMainMenuConfirmationPanel,
     PausePanel,
-    none
+    none,
+    SavePanel
 }

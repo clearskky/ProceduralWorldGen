@@ -12,7 +12,7 @@ public class VignetteController : MonoBehaviour
     private PostProcessVolume ppv;
     private Vignette vignette;
     
-    private void Start()
+    void Start()
     {
         radarLevel = PlayerPrefs.GetInt("radarLevel", 0);
         vignetteDepthMultiplier = UpgradeStation.radarLevelModifiers[radarLevel];
@@ -20,7 +20,7 @@ public class VignetteController : MonoBehaviour
         ppv.profile.TryGetSettings(out vignette);
         vignette.intensity.value = 0f;
     }
-    void FixedUpdate()
+    void LateUpdate()
     {
         float vignetteIntensity = (Mathf.Abs(transform.position.y) / 1000f) * vignetteDepthMultiplier;
         vignetteIntensity = vignetteIntensity > 1 ? 1 : vignetteIntensity < 0 ? 0 : vignetteIntensity; // Clamp intensity to 1 if its greater than 1, clamp to 0 if its less than 0

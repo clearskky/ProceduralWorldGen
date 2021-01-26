@@ -22,12 +22,13 @@ public class Block : MonoBehaviour, IBlock
     public void GetMined()
     {
         if (minable)
-        {
+        {            
             OnBlockMined?.Invoke(this, new OnBlockMinedEventArgs() { posX = posX, posY = posY, blockTypeId = blockTypeId });
-            Destroy(gameObject);
-        } else
+            Destroy(gameObject);            
+        } 
+        else
         {
-            Debug.Log("Cannot mine this");
+            AudioManager.Instance.PlayInvalidActionClip();
         }
     }
 }

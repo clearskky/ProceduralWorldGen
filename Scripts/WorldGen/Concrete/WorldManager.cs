@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Newtonsoft.Json;
+using System;
 
 public class WorldManager : MonoBehaviour
 {
@@ -67,6 +68,7 @@ public class WorldManager : MonoBehaviour
             fillMap = new int[width, height];
             mineralMap = new int[width, height];
             worldGen.InitializeWorld();
+            CommitInitialSave();
         }
 
         deltaMap = fillMap;
@@ -75,6 +77,17 @@ public class WorldManager : MonoBehaviour
         worldGen.InstantiateWorld();
 
         Block.OnBlockMined += Block_OnBlockMined; // Subscribe to the static onblockmined event of the Block class
+    }
+
+    private void CommitInitialSave()
+    {
+        PlayerPrefs.SetString("fillMap", JsonConvert.SerializeObject(fillMap));
+        PlayerPrefs.SetInt("miningSpeedLevel", 0);
+        PlayerPrefs.SetInt("storageLevel", 0);
+        PlayerPrefs.SetInt("fuelTankLevel", 0);
+        PlayerPrefs.SetFloat("cash", 10);
+        PlayerPrefs.SetInt("radarLevel", 0);
+        PlayerPrefs.Save();
     }
 
     private void Block_OnBlockMined(object sender, OnBlockMinedEventArgs blockData)
@@ -93,6 +106,11 @@ public class WorldManager : MonoBehaviour
     public static void SaveGame()
     {
         PlayerPrefs.SetString("fillMap", JsonConvert.SerializeObject(deltaMap));
+        PlayerPrefs.SetInt("miningSpeedLevel", Player.Instance.miningSpeedLevel);
+        PlayerPrefs.SetInt("storageLevel", Player.Instance.storageLevel);
+        PlayerPrefs.SetInt("fuelTankLevel", Player.Instance.fuelTankLevel);
+        PlayerPrefs.SetFloat("cash", Player.Instance.cash);
+        PlayerPrefs.SetInt("radarLevel", Player.Instance.vignetteController.radarLevel);
         PlayerPrefs.Save();
     }
 

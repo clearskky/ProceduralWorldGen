@@ -36,6 +36,8 @@ public class UpgradeStation : MonoBehaviour, IInteractable, IBuilding
     public Text currentFuelTankLevelText;
     public Text currentRadarLevelText;
 
+    public Text interactingPlayerCashText;
+
     //public Text miningSpeedLabel;
     //public Text storageLabel;
     //public Text fuelTankLabel;
@@ -72,6 +74,7 @@ public class UpgradeStation : MonoBehaviour, IInteractable, IBuilding
         maxMiningSpeedUpgradeCount = miningSpeedLevelModifiers.Length;
         maxStorageUpgradeCount = storageLevelModifiers.Length;
         maxFuelTankUpgradeCount = fuelTankLevelModifiers.Length;
+        maxRadarUpgradeCount = radarLevelModifiers.Length;
 
         interactingPlayer = playerData.interactingPlayer;
 
@@ -124,9 +127,13 @@ public class UpgradeStation : MonoBehaviour, IInteractable, IBuilding
         }
         else
         {
+            //Debug.Log(interactingPlayer.vignetteController.radarLevel);
+            //Debug.Log(maxRadarUpgradeCount);
             upgradeRadarLevelButton.enabled = false;
             radarLevelUpgradePriceText.enabled = false;
         }
+
+        interactingPlayerCashText.text = "$" + interactingPlayer.cash.ToString();
     }
 
     
@@ -140,6 +147,10 @@ public class UpgradeStation : MonoBehaviour, IInteractable, IBuilding
             AdjustUIElements();
             interactingPlayer.AdjustMiningDrillProperties();
         }
+        else
+        {
+            AudioManager.Instance.PlayInvalidActionClip();
+        }
     }
 
     public void UpgradeStorage()
@@ -150,6 +161,10 @@ public class UpgradeStation : MonoBehaviour, IInteractable, IBuilding
             interactingPlayer.storageLevel += 1;            
             AdjustUIElements();
             interactingPlayer.AdjustMiningDrillProperties();
+        }
+        else
+        {
+            AudioManager.Instance.PlayInvalidActionClip();
         }
     }
 
@@ -162,6 +177,10 @@ public class UpgradeStation : MonoBehaviour, IInteractable, IBuilding
             AdjustUIElements();
             interactingPlayer.AdjustMiningDrillProperties();
         }
+        else
+        {
+            AudioManager.Instance.PlayInvalidActionClip();
+        }
     }
 
     public void UpgradeRadar()
@@ -172,6 +191,10 @@ public class UpgradeStation : MonoBehaviour, IInteractable, IBuilding
             interactingPlayer.vignetteController.radarLevel += 1;            
             AdjustUIElements();
             interactingPlayer.vignetteController.AdjustVignetteProperties();
+        }
+        else
+        {
+            AudioManager.Instance.PlayInvalidActionClip();
         }
     }
 

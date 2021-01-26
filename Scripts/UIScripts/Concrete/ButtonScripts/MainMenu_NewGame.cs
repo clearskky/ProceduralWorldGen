@@ -9,6 +9,6 @@ public class MainMenu_NewGame : MonoBehaviour, IButton
     {
         PlayerPrefs.SetInt("worldHasBeenInitialized", 0);
         PlayerPrefs.Save();
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(1);
     }
 }
